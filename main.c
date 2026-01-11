@@ -47,7 +47,7 @@ void print_response(char *response){
         cJSON *repo_name = cJSON_GetObjectItem(repo, "name");
 
         if (cJSON_IsString(type) && cJSON_IsString(repo_name)) {
-            printf("Event: %s, Repo: %s\n", type->valuestring, repo_name->valuestring);
+            printf("%s\n -> Repo: %s\n", type->valuestring, repo_name->valuestring);
         }
     }
 }
