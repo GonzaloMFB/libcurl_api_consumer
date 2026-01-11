@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <curl/curl.h>
+#include <cjson/cJSON.h>
 
 typedef struct Response{
   char *memory;
@@ -31,13 +32,30 @@ size_t callback(void *contents, size_t size, size_t nmemb, void *userp) {
 
 }
 
-void print_response(){
+void print_response(char *response){
+    cJSON *root = cJSON_Parse(response);
+    // cJSON stores
+    if (!root) {
+        printf("Error parsing JSON\n");
+        return;
+    }
+    int arr_size = cJSON_GetArraySize(root);
+    for (int i = 0; i < arr_size; i++){
+        cJSON *item = cJSON_GetArrayItem(root, i);
+        cJSON *type = cJSON_GetObjectItem(item, "type");
+        cJSON *repo = cJSON_GetObjectItem(item, "repo");
+        cJSON *repo_name = cJSON_GetObjectItem(repo, "name");
 
+        if (cJSON_IsString(type) && cJSON_IsString(repo_name)) {
+            printf("Event: %s, Repo: %s\n", type->valuestring, repo_name->valuestring);
+        }
+    }
 }
 
 char* build_url(char *username){
     char *base = "https://api.github.com/users/";
     char *suffix = "/events";
+    // Build buffer
     char *url = malloc(strlen(base) + strlen(username) + strlen(suffix) +1);
     strcpy(url, base);
     strcat(url, username);
@@ -77,7 +95,6 @@ int main(int argc, char *argv[]) {
   curl_easy_cleanup(hnd);
   hnd = NULL;
   if (ret == CURLE_OK) {
-    printf("%s\n", chunk.memory);
     print_response(chunk.memory);
   } else {
     fprintf(stderr, "Curl request failed: %s\n", curl_easy_strerror(ret));
