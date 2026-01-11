@@ -16,7 +16,7 @@ size_t callback(void *contents, size_t size, size_t nmemb, void *userp) {
     size_t new_mem = res->size + totalSize + 1;  // +1 for null terminator.
     char *ptr = realloc(res->memory, new_mem);
     if (ptr == NULL) {
-        fprintf("Failed to reallocate %ld bytes\n", new_mem);
+        fprintf(stderr, "Failed to reallocate %ld bytes\n", new_mem);
         return 0;
     }
     res->memory = ptr;
@@ -28,6 +28,10 @@ size_t callback(void *contents, size_t size, size_t nmemb, void *userp) {
     res->memory[res->size] = '\0';
 
     return totalSize;
+
+}
+
+void print_response(){
 
 }
 
@@ -74,6 +78,7 @@ int main(int argc, char *argv[]) {
   hnd = NULL;
   if (ret == CURLE_OK) {
     printf("%s\n", chunk.memory);
+    print_response(chunk.memory);
   } else {
     fprintf(stderr, "Curl request failed: %s\n", curl_easy_strerror(ret));
   }
