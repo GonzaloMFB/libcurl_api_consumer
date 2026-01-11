@@ -50,6 +50,7 @@ void print_response(char *response){
             printf("%s\n -> Repo: %s\n", type->valuestring, repo_name->valuestring);
         }
     }
+    cJSON_Delete(root);
 }
 
 char* build_url(char *username){
@@ -57,6 +58,9 @@ char* build_url(char *username){
     char *suffix = "/events";
     // Build buffer
     char *url = malloc(strlen(base) + strlen(username) + strlen(suffix) +1);
+    if (url == NULL) {
+        fprintf(stderr, "Failed to allocate enough memory when building the URL.\n");
+    }
     strcpy(url, base);
     strcat(url, username);
     strcat(url, suffix);
@@ -76,6 +80,9 @@ int main(int argc, char *argv[]) {
 
   Response chunk;
   chunk.memory = malloc(1);
+  if (chunk.memory == NULL) {
+        fprintf(stderr, "Failed to allocate enough memory when initializing the response chunk.\n");
+    }
   chunk.size = 0;
 
   char *url = build_url(argv[1]);
